@@ -404,14 +404,22 @@ void sorted_merge_print(bstree *tree1, bstree *tree2) {
   }
 }
 
-int main(int argc, char **argv) {
-  bstree *t = create_bstree(50);
-  add_with_level(t, 30, 0);
-  add_with_level(t, 70, 0);
-  add_with_level(t, 20, 0);
-  add_with_level(t, 40, 0);
-  add_with_level(t, 60, 0);
-  add_with_level(t, 80, 0);
+bstree *create_bstree_sorted_array(int *arr, int low, int high) {
+  if (arr == NULL || low > high) {
+    return NULL;
+  }
 
-  print_boundary(t);
+  int mid = low + (high - low) / 2;
+
+  bstree *tree = create_bstree(arr[mid]);
+
+  tree->left = create_bstree_sorted_array(arr, low, mid - 1);
+  tree->right = create_bstree_sorted_array(arr, mid + 1, high);
+  return tree;
+}
+
+int main(int argc, char **argv) {
+  int a[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+  bstree *t = create_bstree_sorted_array(a, 0, 7);
+  print_bfs_sameline1(t);
 }

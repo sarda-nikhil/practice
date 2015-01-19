@@ -170,16 +170,123 @@ int get_nth(list *list, int n) {
   return -1;
 }
 
-int main(int argc, char **argv) {
-  list *l1 = create_list(1);
-  for (int i = 2; i < 10; i++) {
-    add_item(l1, i);
-    add_item(l1, 5);
+// EPI 8.1
+list *merge(list *l1, list *l2) {
+  if (l1 == NULL) {
+    return l2;
+  } else if (l2 == NULL) {
+    return l1;
   }
 
-  add_head(l1, 42);
+  list *start = NULL;
+  list *curr = NULL;
 
-  //print_list(l1);
+  if (l1->item > l2->item) {
+    start = l2;
+    l2 = l2->next;
+  } else {
+    start = l1;
+    l1 = l1->next;
+  }
+  curr = start;
 
-  printf("%d %d", get_nth(l1, 1), get_nth(l1, 0));
+  while (l1 != NULL && l2 != NULL) {
+    if (l1->item > l2->item) {
+      curr->next = l2;
+      l2 = l2->next;
+    } else {
+      curr->next = l1;
+      l1 = l1->next;
+    }
+
+    curr = curr->next;
+
+    if (l1 == NULL) {
+      curr->next = l2;
+    } else if (l2 == NULL) {
+      curr->next = l1;
+    }
+  }
+
+  return start;
+}
+
+// EPI 8.2
+list *reverse_nonrec(list *l1) {
+  if (l1 == NULL) {
+    return l1;
+  }
+
+  list *prev = l1;
+  list *curr = l1->next;
+  list *temp = NULL;
+  prev->next = NULL;
+
+  while (curr != NULL) {
+    temp = curr;
+    curr = curr->next;
+    temp->next = prev;
+    prev = temp;
+  }
+
+  return prev;
+}
+
+// EPI 8.3
+// Revisit this problem. This does not handle cases where k = 0
+// This is needed for the next problem
+list *reverse_sublist(list *l1, int k, int f) {
+  list *sublist_start = l1;
+  list *sublist_end = NULL;
+  list *sublist_next = NULL;
+
+  if (l1 == NULL) {
+    return l1;
+  }
+
+  for (int i = 0; i < k - 1; i++) {
+    sublist_start = sublist_start->next;
+    if (sublist_start == NULL) {
+      return NULL;
+    }
+  }
+
+  sublist_end = sublist_start;
+
+  for (int i = 0; i < f - 1; i++) {
+    sublist_end = sublist_end->next;
+    if (sublist_end == NULL) {
+      return NULL;
+    }
+  }
+
+  sublist_next = sublist_end->next;
+  sublist_end->next = NULL;
+
+  sublist_start->next = reverse_nonrec(sublist_start->next);
+
+  while (sublist_start->next != NULL) {
+    sublist_start = sublist_start->next;
+  }
+  sublist_start->next = sublist_next;
+
+  return l1;
+}
+
+
+
+int main(int argc, char **argv) {
+  list *l1 = create_list(2);
+  add_item(l1, 5);
+  add_item(l1, 7);
+  add_item(l1, 9);
+  add_item(l1, 11);
+  add_item(l1, 13);
+  add_item(l1, 15);
+  add_item(l1, 17);
+  add_item(l1, 19);
+  add_item(l1, 21);
+  add_item(l1, 23);
+
+  print_list(reverse_sublist(l1, 0, 3));
 }
